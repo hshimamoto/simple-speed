@@ -19,7 +19,7 @@ Sequence
     |..data..| ... data stream
 
 4. Client ---> Server
-    |EN|duration| ... end test
+    |EN| ... end test
 
 5. Client <--- Server
     |RESPONSE|duration| ... in usec
@@ -38,7 +38,7 @@ Sequence
     |..data..| ... data stream
 
 4. Client ---> Server
-    |EN|duration| ... end test
+    |EN| ... end test
 
 5. Client <--- Server
     |RESPONSE|duration| ... in usec

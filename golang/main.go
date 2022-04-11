@@ -102,6 +102,7 @@ func server_work(conn net.Conn) {
 	log.Printf("Bad Start marker: %s", string(st))
 	return
     }
+    tm_start := time.Now()
 
     log.Printf("DATA START")
     var errdummy error = nil
@@ -117,15 +118,15 @@ func server_work(conn net.Conn) {
     log.Printf("DATA END")
 
     // finally get end marker EN
-    msg := make([]byte, 10)
-    if err := readnbytes(conn, msg); err != nil {
+    en := make([]byte, 2)
+    if err := readnbytes(conn, en); err != nil {
 	log.Printf("End marker error: %v", err)
 	return
     }
-    ts_end := binary.LittleEndian.Uint64(msg[2:])
-    log.Printf("finish in %d usec", ts_end)
+    dur := uint64(time.Since(tm_start).Microseconds())
+    log.Printf("finish in %d usec", dur)
     resp := []byte("RESPONSETTTTTTTT")
-    binary.LittleEndian.PutUint64(resp[8:], ts_end)
+    binary.LittleEndian.PutUint64(resp[8:], dur)
     conn.Write(resp)
 }
 
@@ -174,7 +175,6 @@ func client(raddr, dir, length string) {
     binary.LittleEndian.PutUint64(request[8:], uint64(nlen))
     conn.Write(request)
 
-    tm_start := time.Now()
     // send Start marker
     conn.Write([]byte("ST"))
 
@@ -191,11 +191,8 @@ func client(raddr, dir, length string) {
     }
     log.Printf("DATA END")
 
-    // send End marker and duration
-    msg := []byte("ENTTTTTTTT")
-    dur := time.Since(tm_start)
-    binary.LittleEndian.PutUint64(msg[2:], uint64(dur.Microseconds()))
-    conn.Write(msg)
+    // send End marker
+    conn.Write([]byte("EN"))
 
     resp := make([]byte, 16)
     if err := readnbytes(conn, resp); err != nil {

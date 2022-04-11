@@ -54,11 +54,7 @@ def client(req_addr, req_dir, req_length):
                     raise Exception("unexpected stop")
                 rest -= sent
         print(f"DATA {req_dir} END")
-        duration = time() - tm_start
-        usec = int(duration * 1000 * 1000)
-        #print(f"DONE in {usec} usec")
-        en = b"EN" + pack("<Q", usec)
-        s.sendall(en)
+        s.sendall(b'EN')
         resp = s.recv(16)
         # get usec from RESPONSE
         vals = unpack("<Q", resp[8:16])
